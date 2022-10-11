@@ -9,7 +9,7 @@ app.use(cors());    // su dung thu vien cors
 
 //ket noi
 const db = mysql.createConnection({
-    host: '37.59.55.185',
+    	host: '37.59.55.185',
 	user: 'EskUSL83Cb',
 	password: 'awaNOX5Q9v',
 	port:'3306',
@@ -32,7 +32,16 @@ app.get('/test',(req, res)=>{
     var sql = "select * from test";
     db.query(sql,(err,kq)=>{
         if(err) throw err;
-        console.log(kq);
+
+        // let data = '{"firstName":"John","lastName":"Doe" },' +
+        // '{"firstName":"Anna","lastName":"Smith" },' +
+        // '{"firstName":"Peter","lastName":"Jones" }';
+        // let text = '{"test":' + kq + '}';
+
+        
+        // const obj = JSON.parse(text);
+
+        console.log(kq[0].json());
         res.send(kq);   //tra ket qua ve cho react alo
     });
 });
