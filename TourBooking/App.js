@@ -1,6 +1,15 @@
 import React, { Component, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import SplashScreen from 'react-native-splash-screen'
+import ManagerScreen from './screen/ManagerScreen';
+
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+const Stack = createNativeStackNavigator();
+
+import LoginScreen from './screen/LoginScreen';
+
+
 
 export default function App () {
 
@@ -9,9 +18,24 @@ export default function App () {
   })
 
 return(
-  <View>
-    <Text>APP</Text>
-  </View>
+  <NavigationContainer>
+    <Stack.Navigator
+      initialRouteName='Login'
+      screenOptions={{headerShown: false}} 
+    >
+        <Stack.Screen
+          name = "LoginScreen"
+          component = {LoginScreen}
+        />
+        <Stack.Screen
+          name = "ManagerScreen"
+          component = {ManagerScreen}
+        />
+    </Stack.Navigator>
+  </NavigationContainer>
+  // <View>
+  //   <ManagerScreen/>
+  // </View>
 )
 }
 // export default class App extends Component {
