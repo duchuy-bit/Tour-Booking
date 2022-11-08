@@ -1,5 +1,8 @@
-import React, { Component, useEffect } from 'react';
+import React, { Component, useEffect,useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import SplashScreen from 'react-native-splash-screen'
 import ManagerScreen from './screen/ManagerScreen';
 
@@ -8,19 +11,48 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
 
 import LoginScreen from './screen/LoginScreen';
+import HomeScreen from './screen/HomeScreen';
 
 
 
 export default function App () {
 
+  const [isLogin,setIsLogin] = useState(false);
+
+  checkLogin = async () => {
+    // try {
+    //   const value = await AsyncStorage.getItem('Login')
+    //   .finally(()=>{console.log('load storage thanh cong')});
+
+    //   if (value !== null) {
+    //     // We have data!!
+    //     if (value === 'I like to save it.') 
+    //       setIsLogin(true);
+    //     console.log('islogin: '+ isLogin)
+    //     console.log(value);
+    //   }
+    // } catch (error) {
+    //   console.log(error)
+    // }
+  };
+
+
+
   useEffect(()=>{
-    SplashScreen.hide();
+    // SplashScreen.hide();
+    checkLogin().finally(()=>{
+      setTimeout(() => {
+        console.log('delay');
+        SplashScreen.hide();
+      }, 1000);
+    })
   })
+
 
 return(
   <NavigationContainer>
     <Stack.Navigator
-      initialRouteName='Login'
+      initialRouteName='LoginScreen'
       screenOptions={{headerShown: false}} 
     >
         <Stack.Screen
@@ -30,6 +62,10 @@ return(
         <Stack.Screen
           name = "ManagerScreen"
           component = {ManagerScreen}
+        />
+        <Stack.Screen
+          name = "HomeScreen"
+          component = {HomeScreen}
         />
     </Stack.Navigator>
   </NavigationContainer>
