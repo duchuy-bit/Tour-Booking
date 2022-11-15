@@ -1,5 +1,5 @@
 import React, { Component, useEffect,useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+// import { View, Text, TouchableOpacity } from 'react-native';
 
 // import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -8,13 +8,33 @@ import { Provider } from "react-redux";
 import SplashScreen from 'react-native-splash-screen'
 import ManagerScreen from './screen/ManagerScreen';
 
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-// import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
+// import * as React from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createSharedElementStackNavigator} from 'react-navigation-shared-element';
+
+// import {NavigationContainer} from '@react-navigation/native';
+// import {createSharedElementStackNavigator} from 'react-navigation-shared-element';
+import {enableScreens} from 'react-native-screens';
+
+// LogBox.ignoreLogs([""]);
+
+
+enableScreens();
+
+
+// import {createAppContainer} from 'react-navigation';
+// import {createSharedElementStackNavigator4} from 'react-navigation-shared-element';
 
 // const Stack = createSharedElementStackNavigator();
-const Stack = createNativeStackNavigator();
+
+// import { NavigationContainer } from '@react-navigation/native';
+// import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+// // import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
+
+const Stack = createSharedElementStackNavigator();
+// const Stack = createNativeStackNavigator();
 
 import LoginScreen from './screen/LoginScreen';
 import HomeScreen from './screen/HomeScreen';
@@ -22,6 +42,9 @@ import WelcomeScreen from './screen/WelcomeScreen';
 import DetailScreen from './screen/DetailScreen';
 import store from './redux/reducer';
 import AccountScreen from './screen/AccountScreen';
+// import AddToCartScreen from './screen/AddToCartScreen';
+import { LogBox, SafeAreaView } from 'react-native';
+import CartScreen from './screen/CartScreen';
 
 
 
@@ -61,40 +84,22 @@ export default function App () {
 
 
 return(
-  <Provider store={store}>
-  <NavigationContainer>
-    <Stack.Navigator
-      initialRouteName='WelcomeScreen'
-      screenOptions={{headerShown: false}} 
-    >
-        <Stack.Screen
-          name = "WelcomeScreen"
-          component = {WelcomeScreen}
-        />
-
-        <Stack.Screen
-          name = "LoginScreen"
-          component = {LoginScreen}
-        />
-        <Stack.Screen
-          name = "ManagerScreen"
-          component = {ManagerScreen}
-        />
-        <Stack.Screen
-          name = "HomeScreen"
-          component = {HomeScreen}
-        />
-        <Stack.Screen
-          name = "DetailScreen"
-          component={DetailScreen}
-        />
-        <Stack.Screen
-          name = "AccountScreen"
-          component={AccountScreen}
-        />
-    </Stack.Navigator>
-  </NavigationContainer>
-  </Provider>
+  // <SafeAreaView>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator  initialRouteName='WelcomeScreen'  screenOptions={{headerShown: false}} >
+            <Stack.Screen name = "WelcomeScreen" component = {WelcomeScreen}  />
+            <Stack.Screen  name = "LoginScreen" component = {LoginScreen}/>
+            <Stack.Screen name = "ManagerScreen" component = {ManagerScreen}/>
+            <Stack.Screen name = "HomeScreen" component = {HomeScreen} />
+            <Stack.Screen  name = "DetailScreen"  component={DetailScreen}/>
+            <Stack.Screen  name = "AccountScreen"  component={AccountScreen}/>
+            {/* <Stack.Screen  name = "AddToCartScreen"  component={AddToCartScreen}/> */}
+            <Stack.Screen name = "CartScreen" component={CartScreen}/>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
+  // </SafeAreaView>
 )
 }
 // export default class App extends Component {

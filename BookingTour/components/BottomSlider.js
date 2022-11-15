@@ -41,7 +41,7 @@ export default class BottomSlider extends Component {
 
     render() {
         return (
-        <View style={{flex: 1, }}>
+        <View style={{flex: 1, backgroundColor: 'white' }}>
             <Text> BottomSlider </Text>
         </View>
         );

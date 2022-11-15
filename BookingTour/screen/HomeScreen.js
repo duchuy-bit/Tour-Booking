@@ -9,13 +9,13 @@ import Octicon from "react-native-vector-icons/Octicons";
 import Foundation from "react-native-vector-icons/Foundation";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-
+import {SharedElement} from 'react-navigation-shared-element';
 // import {SharedElement} from "react-navigation-shared-element";
-import {
-    SharedElement,
-    SharedElementTransition,
-    nodeFromRef
-} from 'react-native-shared-element';
+// import {
+//     SharedElement,
+//     SharedElementTransition,
+//     nodeFromRef
+// } from 'react-native-shared-element';
 
 
 // import FontAwe5 from "react-native-vector-icons/FontAwesome5";
@@ -86,7 +86,7 @@ return (
             <Icon name="account-circle" size={40} color='black'/>
         </TouchableOpacity>
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={()=>this.props.navigation.navigate('CartScreen')}>
             <CartComponent />
         </TouchableOpacity>
     </View>
@@ -97,7 +97,9 @@ return (
     {/* Search And Cart */}
     <View style={styles.searchContainer}>
         <View style={styles.searchBorder}>
-            <Icon name='search' size={30} style={styles.iconSearch}/>
+            <TouchableOpacity>
+                <Icon name='search' size={30} style={styles.iconSearch}/>
+            </TouchableOpacity>
             <TextInput placeholder='Search' placeholderTextColor={"grey"} style={styles.txtSearch} />
         </View>
 
@@ -192,7 +194,7 @@ return (
                         <SharedElement  id={`item.${item.id}.anh`}
                             style={{ width: "45%", height: '100%' ,borderRadius:25}}>
                             <Image source={{uri: 'https://raw.githubusercontent.com/duchuy-bit/Group_PHP/main/images/'+item.anh,}}
-                                style={{ flex: 1,borderRadius:25}}/>
+                                style={{ flex: 1,borderRadius:25, resizeMode:'cover'}}/>
                         </SharedElement>
                         {/* </SharedElement> */}
                     </View>

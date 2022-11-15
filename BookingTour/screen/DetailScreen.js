@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useRef, useState } from 'react';
-import { View, Text, Image,Dimensions, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
+import { View, Text, Image,Dimensions, StyleSheet, TouchableOpacity, ScrollView, Modal, Animated, Pressable} from 'react-native';
 import Lottie from 'lottie-react-native';
 
 
@@ -9,12 +9,12 @@ import Octicon from "react-native-vector-icons/Octicons";
 import Foundation from "react-native-vector-icons/Foundation";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {
-    SharedElement,
-    SharedElementTransition,
-    nodeFromRef
-} from 'react-native-shared-element';
-// import {SharedElement} from "react-navigation-shared-element";
+// import {
+//     SharedElement,
+//     SharedElementTransition,
+//     nodeFromRef
+// } from 'react-native-shared-element';
+import {SharedElement} from "react-navigation-shared-element";
 // import FontAwe5 from "react-native-vector-icons/FontAwesome5";
 
 // import MenuComponent from '../components/MenuComponent';
@@ -34,18 +34,31 @@ const {height, width} = Dimensions.get('window');
 
 import { useSelector, useDispatch } from 'react-redux'
 import CartComponent from '../components/CartComponent';
+// import BottomSlider from '../components/BottomSlider';
 
 // import { connect } from "react-redux";
 
+// import React, { Component } from 'react';
+// import { View, Text } from 'react-native';
+
+import {connect} from "react-redux";
+import FormAddToCart from '../components/FormAddToCart';
 
 export default function DetailScreen ({route ,navigation}){
     const {item} = route.params;
+
+    const timeDurationSlider= 300;
+
+    const [tam,setTam]= useState(100);
 
     // const animation = useRef(null);
     // const [isLove,setIsLove] = useState(false);
     const [isLoadPrice, setIsLoadPrice]= useState(false);
     const [isActiveService, setIsActiveService] = useState(false);
     const [listPrice,setListPrice]= useState([]);
+
+    const [openBottomSlider, setOpenBottomSlider]= useState(false);
+    const bottomSliderAnim = useRef(new Animated.Value(0)).current;
     // const [listCart,setListCart]= useState([]);
 
     const [price, setPrice] = useState(0);
@@ -65,16 +78,13 @@ export default function DetailScreen ({route ,navigation}){
     priceChange=(a)=>{
         let text= a.toString();
         let tam="";
-        let start=0;let end=0;
-        for (let i=0; i< Math.floor(text.length/3) ;i++)
-        {
-            start = text.length - 3 - i*3; end = text.length - i*3;
-            tam= "."+ text.substr(text.length - 3 - i*3, 3)+ tam;
-            // console.log(tam);
+
+        let d=-1;
+        for (i = text.length-1 ; i>=0 ;i--){
+            d++;
+            if (d%3 === 0 && d !== 0 ) tam= text[i] + "." + tam;
+            else tam = text[i] + tam;
         }
-        // tam = '.'+tam;
-        tam = text.substr(0, text.length - Math.floor(text.length/3)*3)+ tam;
-        
         return tam;
     }
 
@@ -96,69 +106,109 @@ export default function DetailScreen ({route ,navigation}){
         .catch((err)=> console.log(err));
     };
 
-    const updateCart = async (sl_Service)=>{
-        fetch(ipconfig+'/updateslgiohang', { method: 'POST',
-            headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
-            body: JSON.stringify({ id_khachhang: idCustomer, id_gia: idPrice, sl: sl_Service+ 1,ngaythem: new Date()})
-        })
-        // .then((response)=> response.json())
-        // .then((res)=>{
-        //     console.log(res.giohang)
-
-        //     res.giohang.forEach((element)=>{
-        //         if(element.id_gia === idPrice && element.id_khachhang === idCustomer){
-
-        //         }
-        //     })
-        // })
-        .catch((err)=> console.log(err));
-    }
-
-    const checkService = async()=>{
-        let check= false;
+    const refreshCart = async ()=>{
         await fetch(ipconfig+'/giohang', { method: 'POST',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
-            body: JSON.stringify({ id: idCustomer,})
+            body: JSON.stringify({ id: notes.idCustomer[0],})
         })
         .then((response)=> response.json())
         .then((res)=>{
-            console.log(res.giohang)
+            console.log('Length Cart: '+res.giohang.length)
 
-            res.giohang.forEach((element)=>{
-                if(element.id_gia === idPrice && element.id_khachhang === idCustomer){ 
-                    console.log('--------Update service------------')   
-                                    
-                    updateCart(element.sl);
-                    // setIsActiveService(true);
-                    check= true;
-
-                    return;
-                }
+            dispatch({
+                type: 'ChangeCart',
+                amountCart: res.giohang.length,
             })
+            console.log('------------------------------------------------')
         })
         .catch((err)=> console.log(err))
-        .finally(()=>{
-            if (check=== false){
-                console.log("---------insert new-----------");
-                dispatch({ type: 'ChangeCart', amountCart: parseInt(notes.cartAmount) + 1, })
-                insertCart();
-            }
-        })
-        ;
     }
 
-    const insertCart = async ()=>{
-        await fetch(ipconfig+ "/insertgiohang",{
-            method :"POST",
-            headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
-            body: JSON.stringify({ 
-                id_khachhang: idCustomer,
-                id_gia: idPrice,
-                sl: 1,
-                ngaythem: new Date(),
-            })
-        })
-    }
+    // const changeBottomSlider = ()=>{
+    //     setOpenBottomSlider(!openBottomSlider);
+    // }
+
+    // const updateCart = async (sl_Service)=>{
+    //     fetch(ipconfig+'/updateslgiohang', { method: 'POST',
+    //         headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
+    //         body: JSON.stringify({ id_khachhang: idCustomer, id_gia: idPrice, sl: sl_Service+ 1,ngaythem: new Date()})
+    //     })
+    //     // .then((response)=> response.json())
+    //     // .then((res)=>{
+    //     //     console.log(res.giohang)
+
+    //     //     res.giohang.forEach((element)=>{
+    //     //         if(element.id_gia === idPrice && element.id_khachhang === idCustomer){
+
+    //     //         }
+    //     //     })
+    //     // })
+    //     .catch((err)=> console.log(err));
+    // }
+
+    // const checkService = async()=>{
+    //     let check= false;
+    //     await fetch(ipconfig+'/giohang', { method: 'POST',
+    //         headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
+    //         body: JSON.stringify({ id: idCustomer,})
+    //     })
+    //     .then((response)=> response.json())
+    //     .then((res)=>{
+    //         console.log(res.giohang)
+
+    //         res.giohang.forEach((element)=>{
+    //             if(element.id_gia === idPrice && element.id_khachhang === idCustomer){ 
+    //                 console.log('--------Update service------------')   
+                                        
+    //                 updateCart(element.sl);
+    //                 // setIsActiveService(true);
+    //                 check= true;
+
+    //                 return;
+    //             }
+    //         })
+    //     })
+    //     .catch((err)=> console.log(err))
+    //     .finally(()=>{
+    //         if (check=== false){
+    //             console.log("---------insert new-----------");
+    //             dispatch({ type: 'ChangeCart', amountCart: parseInt(notes.cartAmount) + 1, })
+    //             insertCart();
+    //         }
+    //     })
+    //     ;
+    // }
+
+    // const insertCart = async ()=>{
+    //     await fetch(ipconfig+ "/insertgiohang",{
+    //         method :"POST",
+    //         headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
+    //         body: JSON.stringify({ 
+    //             id_khachhang: idCustomer,
+    //             id_gia: idPrice,
+    //             sl: 1,
+    //             ngaythem: new Date(),
+    //         })
+    //     })
+    // }
+
+    const openSlider = () => {
+        // Will change fadeAnim value to 1 in 5 seconds
+        Animated.timing(bottomSliderAnim, {
+            toValue: height/2-60,
+            duration: timeDurationSlider,
+            useNativeDriver: false
+        }).start();
+    };
+    
+    const closeSlider = () => {
+        // Will change fadeAnim value to 0 in 3 seconds
+        Animated.timing(bottomSliderAnim, {
+            toValue: 0,
+            duration: timeDurationSlider,
+            useNativeDriver: false
+        }).start();
+    };
 
     useEffect(()=>{
         // console.log('effect')
@@ -171,6 +221,10 @@ export default function DetailScreen ({route ,navigation}){
         fetchData().finally((res)=>{
             setIsLoadPrice(true);
         });
+
+        console.log("Bottom Slider: "+ notes.bottomSlider)
+
+
     },[])
 
 
@@ -178,30 +232,49 @@ export default function DetailScreen ({route ,navigation}){
     // const addItemToCart = item => dispatch({ type: 'ChangeCart', amountCart: notes.cartAmount + 1, })
 
 
-    touchAddToCart = ()=>{
-        console.log('touch ADD')
-        // setIdCustomer(notes.idCustomer[0]);
-        console.log("Redux touch:"+idCustomer),
-        
-        
+    // touchAddToCart = ()=>{
+    //     console.log('touch ADD')
+    //     // setIdCustomer(notes.idCustomer[0]);
+    //     console.log("Redux touch:"+idCustomer);
 
-        // this.props.dispatch({
-        //     type: 'ChangeCart',
-        //     amountCart: this.props.amountCart + 1,
-        // })
-
-        // insertCart();
-        checkService();
 
         
-    }
+    //     // setOpenBottomSlider(true);
+    //     // checkService();
+
+        
+    // }
 
 return(
 <View style={{flex:1, backgroundColor: colors.background}}>
 
+    <Modal
+    animationType="fade"
+    style={{flex: 1,alignSelf: 'center',height:100,width:100}}
+    transparent={true}
+    visible={notes.bottomSlider}
+    onRequestClose={() => {}}
+>
+    <Pressable onPress={()=>{
+        closeSlider();
+        setTimeout(() => {
+            dispatch({ type: 'BOTTOM_SLIDER', })
+            // setOpenBottomSlider(false)
+        }, timeDurationSlider);
+    }}
+        style={{backgroundColor:'rgba(0, 0, 0, 0.5)',width:width,height:height,alignItems:'center',justifyContent:'flex-end'}}
+    >
+        <Animated.View style={[styles.bottomSliderBackground,{height: bottomSliderAnim}]}>
+            <Pressable style={styles.bottomSlider}>
+                <FormAddToCart item={item} listPrice={listPrice}/>
+            </Pressable>
+        </Animated.View>
+    </Pressable>
+</Modal>
+
 <ScrollView>
     <View>
-        <SharedElement  id={`item.${item.id}.anh`}>
+        <SharedElement  id={`item.${item.id}.anh`} >
         <Image source={{uri: 'https://raw.githubusercontent.com/duchuy-bit/Group_PHP/main/images/'+item.anh,}}
             style={{width:"100%",height:height/3,resizeMode:'cover',borderBottomLeftRadius:40}}
         />
@@ -262,21 +335,31 @@ return(
 
     {/* Go back and Title Screen */}
     <View style={{marginHorizontal:30,flexDirection:'row',width:width-60,position:'absolute',marginTop:30,justifyContent:'space-between'}}>
-        <TouchableOpacity onPress={()=>navigation.goBack()}>
+        <TouchableOpacity onPress={()=>{
+            refreshCart();
+            navigation.goBack()
+        }}>
             <View>
                 <Octicon name='arrow-left' size={30} color={'white'}/>
             </View>
         </TouchableOpacity>
 
         <Text style={{fontSize: 16,color: 'white',fontFamily:'Montserrat-Bold'}}>Product</Text>
-        <TouchableOpacity>
+        <Text></Text>
+        {/* <TouchableOpacity onPress={()=>navigation.navigate('CartScreen')}>
             <CartComponent color={'white'}/>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
     </View>
     {/* Add to Cart */}
     {/* <TouchableOpacity></TouchableOpacity> */}
     <View style={styles.addToCartContainer}>
-        <TouchableOpacity onPress={()=>touchAddToCart()}>
+        <TouchableOpacity onPress={()=>{
+            dispatch({ type: 'BOTTOM_SLIDER', })
+            // console.log("Detail: "+tam);
+            // navigation.navigate('AddToCartScreen')
+            // setOpenBottomSlider(true)
+            openSlider();
+        }}>
             <View style={styles.buttonAddtoCart}>
                 <Text style={styles.textAddtoCart}>Add to Cart</Text>
                 <Octicon name='chevron-right' size={20} color={'black'}/>
@@ -289,16 +372,20 @@ return(
 )
 }
 
-// //----------------------------------REDUX----------------------------------------
-// function mapStateToProp(state){
-//     return {
-//         idCustomer: state.idCustomer,
-//         amountCart: state.cartAmount
-//     }
-// }
-
 // export default connect(mapStateToProp)(DetailScreen);
-// //-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+
+
+// DetailScreen.sharedElements = (route, otherRoute, showing) => [
+//     // const {item } = route.params;
+//     // return [`item.${item.id}.anh`]
+//     {id: 'item.${item.id}.anh',animation: 'fade'},
+//     // {id: 'text', animation: 'fade'},
+// ]
+DetailScreen.sharedElements = (route, otherRoute, showing) => {
+    const {item } = route.params;
+    return [`item.${item.id}.anh`]
+};
 
 const styles=  StyleSheet.create({
     heartContainer:{
@@ -376,5 +463,28 @@ const styles=  StyleSheet.create({
         color: colors.textDrak,
         fontFamily:'Montserrat-Bold',
         marginRight:10
+    },
+    bottomSliderBackground:{
+        backgroundColor: 'pink', justifyContent: 'center',
+        opacity: 1, 
+        alignItems: 'center',
+        alignSelf: 'center', 
+        height: 0,
+        width: width,
+        borderTopLeftRadius:50,
+        borderTopRightRadius:50
+    },
+    bottomSlider:{
+        backgroundColor: 'white', justifyContent: 'center',
+        opacity: 1, 
+        alignItems: 'center',
+        alignSelf: 'center', 
+        height: "100%",
+        width: width,
+        borderTopLeftRadius:50,
+        borderTopRightRadius:50
     }
 })
+
+
+
