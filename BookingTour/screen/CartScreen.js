@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, TouchableOpacity, Image, ScrollView, Modal,Animated, Pressable } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
 import { connect } from "react-redux";
@@ -16,7 +16,9 @@ import colors from '../assets/colors/color';
 
 import Swipeable from 'react-native-gesture-handler/Swipeable'
 import { PanGestureHandler } from 'react-native-gesture-handler';
-import Animated from 'react-native-reanimated';
+// import Animated from 'react-native-reanimated';
+import ThreeDotLoading from '../components/ThreeDotLoading';
+import SuccessLoading from '../components/SuccessLoading';
 
 Icon.loadFont();
 Ioni.loadFont();
@@ -37,6 +39,13 @@ class CartScreen extends Component {
             swipeableAnim: new Animated.Value(0),
             slAdult:1,
             slChild: 1,
+            isLoadPay:false,
+            delayPay: true,
+            nameCustomer:'',
+            sdtCustomer:"",
+            emailCustomer:'',
+            bill:{},
+            // modalAnim: new Animated.Value(height/2-100),
         };
     }
     priceChange(a){
@@ -62,7 +71,7 @@ class CartScreen extends Component {
         })
         .then((response)=> response.json())
         .then((res)=>{
-            // this.setState({listCart: res.giohang})
+            this.setState({listCart: res.giohang})
             // console.log(this.state.listCart);
             
             let listCartItem=[];
@@ -131,7 +140,7 @@ class CartScreen extends Component {
             // ---REDUX--------
             this.props.dispatch({
                 type: 'ChangeCart',
-                amountCart: this.props.amountCart-2,
+                amountCart: this.props.amountCart-1,
             })
             //-----------Delete databse ----------
             this.fetchDelete(item.listPrice[0].id_gia)
@@ -211,34 +220,150 @@ class CartScreen extends Component {
         
     }
 
-    UNSAFE_componentWillMount(){
-        console.log("--------CART SCREEN-------------------")
-        this.fetchCart()
+    touchPayNow(){
+        console.log("PAY")
+        this.setState({isLoadPay:true})
+
+        this.fetchAddHoaDon()
+        
+
+        // console.log("Bill: "+ this.state.bill.id)
+        // this.state.listCart.forEach((element)=>{
+        //     // console.log(element)
+        //     this.fetchInsertCTHD(element.id_gia, element.sl, element.giatien)
+        // })
+
+        // setTimeout(() => {
+        //     this.setState({delayPay: false});
+
+        //     setTimeout(() => {
+        //         this.setState({isLoadPay: false})
+        //         this.props.navigation.navigate('BillScreen')
+        //     }, 700);
+        // }, 2000);
+        
+
+
     }
 
-    // swipeableToDelete (progress, dragX ){
-    //     // Animated.timing(this.state.swipeableAnim,
-    //     //     {
-    //     //         duration: 3000,
-    //     //         toValue: 100,
-    //     //         useNativeDriver:false
-    //     //     }
-    //     // ).start()
-    //     return <Animated.View style={{backgroundColor:'red'}}>
-    //         <Text>Delete</Text>
-    //     </Animated.View>
+    async fetchAddHoaDon(){
+        console.log(' - Insert To Hoa don -  '+this.state.nameCustomer+" "+this.state.sdtCustomer+" "+this.state.emailCustomer)
+        await fetch(ipconfig+'/inserthoadon', { method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                id_khachhang : this.props.idCustomer[0], 
+                id_nhanvien : 1,
+                ngaythanhtoan: new Date(),
+                ten_khachhang: this.state.nameCustomer,
+                sdt_khachhang: this.state.sdtCustomer,
+                email_khachhang: this.state.emailCustomer,
+                tongtien: this.totalPrice()
+            })
+        })
+        .then((res)=> res.json())
+        .then((res)=>{
+            console.log("res hoadon: "+res.hoadon[res.hoadon.length-1])
+            this.setState({bill: res.hoadon[res.hoadon.length-1]})
+
+            console.log("Bill: "+ this.state.bill.id)
+
+            let tam=[]; let obj={}
+            this.state.listCart.forEach((element)=>{
+                // console.log(element)
+                // this.fetchInsertCTHD(element.id_gia, element.sl, element.giatien)
+                obj={id_hd: this.state.bill.id, id_gia: element.id_gia, sl: element.sl, giatien : element.giatien}
+                tam.push(obj)
+                // this.fetchDelete(element.id_gia)
+            })
+
+            console.log("Tam")
+            tam.forEach((element)=>{
+                console.log(element.id_gia)
+            })
+
+            this.tryFetchDelete(tam)
+            // .finally(()=>{
+            console.log("finally")
+    
+            //     // setTimeout(() => {
+            this.setState({delayPay: false});
+    
+            setTimeout(() => {
+                this.setState({isLoadPay: false})
+                this.props.navigation.replace('BillScreen',{bill:this.state.bill})
+            }, 700);
+                // }, 2000);
+        })
+        .catch((err)=> console.log(err))
+        .finally(()=>{
+            
+            // });
+            // this.fetchGetCTHD()
+        })
+    }
+
+    tryFetchDelete(listCTHD){
+        console.log(' - Insert To CTHD -  ' )
+        fetch(ipconfig+'/insertcthd', { method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
+            body: JSON.stringify({listCTHD: listCTHD})
+        })
+        .catch((err)=> console.log(err))
+    }
+
+    fetchInsertCTHD(id_gia,sl,giatien){
+        console.log(' - Insert To CTHD -  ' +id_gia)
+        fetch(ipconfig+'/insertcthd', { method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                id_khachhang : this.props.idCustomer[0], 
+                id_hoadon : this.state.bill.id, 
+                id_gia : id_gia,
+                sl: sl,
+                giatien: giatien,
+            })
+        })
+        .catch((err)=> console.log(err))
+    }
+
+    // async fetchGetCTHD(){
+    //     console.log(' - GET CTHD -  ')
+    //     await fetch(ipconfig+'/getcthd', { method: 'POST',
+    //         headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
+    //         body: JSON.stringify({
+    //             id_khachhang : this.props.idCustomer[0], 
+    //             id_hoadon : this.state.bill.id, 
+    //         })
+    //     })
+    //     .then((res)=> res.json())
+    //     .then((res)=>{
+    //         // console.log("get cthd"+res.cthd[0])
+    //     })
+    //     .catch((err)=> console.log(err))
     // }
 
+    async fetchInfoCustomer(){
+        await fetch(ipconfig+'/getkhachhang', { method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
+            body: JSON.stringify({id_khachhang : this.props.idCustomer[0]})
+        })
+        .then((response)=> response.json())
+        .then((res)=>{
+            this.setState({
+                nameCustomer:res.khachhang[0].name,
+                emailCustomer:res.khachhang[0].email,
+                sdtCustomer:res.khachhang[0].sdt,
+            })
+            console.log("Fetch Infomation Customer: "+res.khachhang[0].name)
+        }).catch((err)=> console.log(err))
+    }
 
-    // RightActions  (progress, dragX) { 
-    //     return (
-    //     <TouchableOpacity onPress={()=>{DeleteContact(i)}}>
-    //       <View style={[ContactsStyles.rightAction]}>
-    //         <Text style={ContactsStyles.actionText}>Delete</Text>
-    //       </View>
-    //     </TouchableOpacity>
-    //     ) 
-    //     }
+    UNSAFE_componentWillMount(){
+        console.log("--------CART SCREEN-------------------")
+        this.fetchCart();
+        this.fetchInfoCustomer();
+    }
+
 
 render() {
     //------------------------------SWIPEABLE---------------------
@@ -259,6 +384,30 @@ render() {
 //-------------------------------------------------------------------------
 return (
 <LinearGradient colors={['#729090', '#275052']} start={{x: 0, y: 0}} end={{x: 1, y: 0}} style={{flex: 1,backgroundColor:'#275052'}}>
+{/* Modal Loading Paying */}
+{
+    this.state.isLoadPay? 
+    <Modal
+        animationType="fade"
+        style={{flex: 1,alignSelf: 'center'}}
+        transparent={true}
+        visible={this.state.isLoadPay}
+        onRequestClose={() => this.setState({isLoadPay: false})}
+    >   
+        <Pressable onPress={()=>{this.setState({isLoadPay:'false'})}}>
+            <View style={{height:height,width:width,position:'absolute',backgroundColor:'rgba(0, 0, 0, 0.5)',justifyContent:'center',alignItems:'center'}}>
+                <Pressable>
+                    {
+                        this.state.delayPay? <ThreeDotLoading />: <SuccessLoading/> 
+                    }
+                    {/* <ThreeDotLoading /> */}
+                    {/* <SuccessLoading/> */}
+                </Pressable>
+            </View>
+        </Pressable>
+    </Modal>:<></>
+}
+
     {/* *** Header *** */}
     <View style={styles.headerContainer}>
         <TouchableOpacity onPress={()=>this.props.navigation.goBack()}
@@ -370,7 +519,8 @@ return (
             </Text>
         </View>
 
-        <TouchableOpacity style={{flex: 1,backgroundColor:"#275052",alignItems:'center',justifyContent:'center'}}>
+        <TouchableOpacity onPress={()=>this.touchPayNow()}
+        style={{flex: 1,backgroundColor:"#275052",alignItems:'center',justifyContent:'center'}}>
             <Text style={styles.buttonBuy}>Buy Now</Text>
         </TouchableOpacity>
     </View>

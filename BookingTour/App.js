@@ -45,6 +45,7 @@ import AccountScreen from './screen/AccountScreen';
 // import AddToCartScreen from './screen/AddToCartScreen';
 import { LogBox, SafeAreaView } from 'react-native';
 import CartScreen from './screen/CartScreen';
+import BillScreen from './screen/BillScreen';
 
 
 
@@ -96,6 +97,7 @@ return(
             <Stack.Screen  name = "AccountScreen"  component={AccountScreen}/>
             {/* <Stack.Screen  name = "AddToCartScreen"  component={AddToCartScreen}/> */}
             <Stack.Screen name = "CartScreen" component={CartScreen}/>
+            <Stack.Screen name = "BillScreen" component={BillScreen}/>
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

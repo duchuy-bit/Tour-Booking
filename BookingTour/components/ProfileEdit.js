@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Dimensions,Image,TouchableOpacity } from 'react
 import { TextInput } from 'react-native-gesture-handler';
 import moment from "moment";
 
+
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Ioni from "react-native-vector-icons/Ionicons";
 import Octicon from "react-native-vector-icons/Octicons";
@@ -57,6 +58,9 @@ export default class ProfileEdit extends Component {
     // console.log('Edit Profile')
     const tam = this.props.redux;
     console.log("Name:"+ tam)
+    // let  localTime = moment.utc('18:35', "HH:mm").tz('America/New_York').format("HH:mm");
+    // console.log(localTime);
+
     // console.log(this.props.user[0])
   }
 

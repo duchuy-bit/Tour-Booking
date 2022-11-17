@@ -51,6 +51,7 @@ class HomeScreen extends Component {
     }
 
     UNSAFE_componentWillMount(){
+        this.refreshCart()
         // this.setState({idRedux: this.props.idCustomer})
         const idCustomer = this.props.idCustomer;
         console.log('redux: '+ idCustomer)
@@ -63,6 +64,25 @@ class HomeScreen extends Component {
         })
         .catch((err)=> console.log(err))
         .finally(()=> this.setState({isLoad: false}))
+
+    }
+
+    async refreshCart(){
+        await fetch(ipconfig+'/giohang', { method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
+            body: JSON.stringify({ id: this.props.idCustomer[0],})
+        })
+        .then((response)=> response.json())
+        .then((res)=>{
+            console.log('Length Cart: '+res.giohang.length)
+
+            this.props.dispatch({
+                type: 'ChangeCart',
+                amountCart: res.giohang.length,
+            })
+            console.log('------------------------------------------------')
+        })
+        .catch((err)=> console.log(err))
     }
 
     addressChange(a){
@@ -79,131 +99,133 @@ return (
 <View style={styles.container}>
 {
     this.state.isLoad? <ProgressCircleComponent/>: 
-    <ScrollView>
-    {/* Menu and Account */}
-    <View style={styles.menuContainer}>
-        <TouchableOpacity onPress={()=> this.props.navigation.navigate('AccountScreen')}>
-            <Icon name="account-circle" size={40} color='black'/>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={()=>this.props.navigation.navigate('CartScreen')}>
-            <CartComponent />
-        </TouchableOpacity>
-    </View>
-
-    <Text style={styles.title}>VINPEARL</Text>
-    <Text style={styles.test}>Booking your tour</Text>
-
-    {/* Search And Cart */}
-    <View style={styles.searchContainer}>
-        <View style={styles.searchBorder}>
-            <TouchableOpacity>
-                <Icon name='search' size={30} style={styles.iconSearch}/>
+    <ScrollView >
+        {/* Menu and Account */}
+        <View style={styles.menuContainer}>
+            <TouchableOpacity onPress={()=> this.props.navigation.navigate('AccountScreen')}>
+                <Icon name="account-circle" size={40} color='black'/>
             </TouchableOpacity>
-            <TextInput placeholder='Search' placeholderTextColor={"grey"} style={styles.txtSearch} />
+
+            <TouchableOpacity onPress={()=>this.props.navigation.navigate('CartScreen')}>
+                <CartComponent />
+            </TouchableOpacity>
         </View>
 
-    </View>
-    {/* Categories */}
-    {/* Resort  -  Gastronomy - Explore & activity - Golf */}
-    <View style={styles.categoriesContainer}>
-        <Text style={styles.categoriesTitle}>Categories</Text>
-        <View style={{flexDirection: 'row',justifyContent: 'space-between'}}>
-            <TouchableOpacity>
-                <View style={{justifyContent:'center',alignItems:'center'}}>
-                    <View style={styles.menuItemContainer}>
-                        <Octicon name='organization' size={30} style={styles.iconCategories}/>
-                    </View>
-                    <Text style={styles.textCategories}>Resort</Text>
-                </View>
-            </TouchableOpacity>
+        <Text style={styles.title}>VINPEARL</Text>
+        <Text style={styles.test}>Booking your tour</Text>
 
-            <TouchableOpacity>
-                <View style={{justifyContent:'center',alignItems:'center'}}>
-                    <View style={styles.menuItemContainer}>
-                        <Ioni name='restaurant' size={30} style={styles.iconCategories}/>
-                    </View>
-                    <Text style={styles.textCategories}>Food</Text>
-                </View>
-            </TouchableOpacity>
+        {/* Search And Cart */}
+        <View style={styles.searchContainer}>
+            <View style={styles.searchBorder}>
+                <TouchableOpacity>
+                    <Icon name='search' size={30} style={styles.iconSearch}/>
+                </TouchableOpacity>
+                <TextInput placeholder='Search' placeholderTextColor={"grey"} style={styles.txtSearch} />
+            </View>
 
-            <TouchableOpacity 
-            // onPress={()=>this.props.navigation.navigate('DetaiScreen')}
-            >
-                <View style={{justifyContent:'center',alignItems:'center'}}>
-                    <View style={styles.menuItemContainer}>
-                        <Ioni name='ios-golf' size={30} style={styles.iconCategories}/>
-                    </View>
-                    <Text style={styles.textCategories}>Golf</Text>
-                </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity>
-                <View style={{justifyContent:'center',alignItems:'center'}}>
-                    <View style={styles.menuItemContainer}>
-                        <Foundation name='mountains' size={30} style={styles.iconCategories}/>
-                    </View>
-                    <Text style={styles.textCategories}>Explore</Text>
-                </View>
-            </TouchableOpacity>
-            
         </View>
-    </View>
-
-    {/* -----------POPULAR------------ */}
-    <View style={styles.popularContainer}>
-        <Text style={styles.titlePopular}>Popular</Text>
-            {this.state.item.map((item)=>{
-                return(
-                <TouchableOpacity key={item.id}   onPress={()=>this.props.navigation.navigate('DetailScreen',{item})}>
-                    <View style={styles.itemPopularContainer}>
-                        <View style={{width: '45%',marginHorizontal:20}}>
-                            <Text style={{marginTop:15,fontSize: 14, color: colors.textDrak,fontFamily:'Montserrat-SemiBold'}}>
-                                {item.ten}
-                            </Text>
-
-                            <View style={{flexDirection:'row',alignItems:'center',marginTop:10,marginBottom:7}}>
-                                <Foundation name='telephone' color={'black'} size={15}/>
-                                <Text style={{marginLeft:5,fontSize: 14, color: 'black',fontFamily:'Montserrat-Regular'}}>
-                                    {item.sdt}
-                                </Text>
-                            </View>
-
-                            <View style={{flexDirection:'row',alignItems:'center',marginBottom:10}}>
-                                <MaterialCommunityIcons name='map-marker' color={'black'} size={15}/>
-                                <Text style={{marginLeft:5,fontSize: 14, color: 'black',fontFamily:'Montserrat-Regular'}}>
-                                    {this.addressChange(item.diachi)}
-                                </Text>
-                            </View>
-
-                            <View style={{flexDirection:'row',alignItems:'center'}}>
-                                <TouchableOpacity 
-                                    style={styles.buttonAdd}
-                                    onPress={()=>{}}
-                                >
-                                    <Text style={{fontSize: 16, color: colors.textDrak,fontFamily:'Montserrat-Bold'}}>+</Text>
-                                </TouchableOpacity>
-
-                                <View style={{flexDirection:'row',justifyContent:'center',alignItems:'center',left:-10}}>
-                                    <Icon name='star' size={15} color={'black'}/>
-                                    <Text style={{marginLeft:1,fontSize: 12, color: colors.textDrak,fontFamily:'Montserrat-SemiBold'}}>{item.xeploai}</Text>
-                                </View>
-                            </View>
+        {/* Categories */}
+        {/* Resort  -  Gastronomy - Explore & activity - Golf */}
+        <View style={styles.categoriesContainer}>
+            <Text style={styles.categoriesTitle}>Categories</Text>
+            <View style={{flexDirection: 'row',justifyContent: 'space-between'}}>
+                <TouchableOpacity>
+                    <View style={{justifyContent:'center',alignItems:'center'}}>
+                        <View style={styles.menuItemContainer}>
+                            <Octicon name='organization' size={30} style={styles.iconCategories}/>
                         </View>
-                        {/* <SharedElement id={`item.${item.id}.anh`} style={{ width: "45%", height: '100%' ,borderRadius:25,left:-4}}> */}
-                        <SharedElement  id={`item.${item.id}.anh`}
-                            style={{ width: "45%", height: '100%' ,borderRadius:25}}>
-                            <Image source={{uri: 'https://raw.githubusercontent.com/duchuy-bit/Group_PHP/main/images/'+item.anh,}}
-                                style={{ flex: 1,borderRadius:25, resizeMode:'cover'}}/>
-                        </SharedElement>
-                        {/* </SharedElement> */}
+                        <Text style={styles.textCategories}>Resort</Text>
                     </View>
                 </TouchableOpacity>
-                )
-            })
-        }
-    </View>
-</ScrollView>
+
+                <TouchableOpacity>
+                    <View style={{justifyContent:'center',alignItems:'center'}}>
+                        <View style={styles.menuItemContainer}>
+                            <Ioni name='restaurant' size={30} style={styles.iconCategories}/>
+                        </View>
+                        <Text style={styles.textCategories}>Food</Text>
+                    </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                // onPress={()=>this.props.navigation.navigate('DetaiScreen')}
+                >
+                    <View style={{justifyContent:'center',alignItems:'center'}}>
+                        <View style={styles.menuItemContainer}>
+                            <Ioni name='ios-golf' size={30} style={styles.iconCategories}/>
+                        </View>
+                        <Text style={styles.textCategories}>Golf</Text>
+                    </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity>
+                    <View style={{justifyContent:'center',alignItems:'center'}}>
+                        <View style={styles.menuItemContainer}>
+                            <Foundation name='mountains' size={30} style={styles.iconCategories}/>
+                        </View>
+                        <Text style={styles.textCategories}>Explore</Text>
+                    </View>
+                </TouchableOpacity>
+                
+            </View>
+        </View>
+
+        {/* -----------POPULAR------------ */}
+        <View style={styles.popularContainer}>
+            <Text style={styles.titlePopular}>Popular</Text>
+                {this.state.item.map((item)=>{
+                    return(
+                    <TouchableOpacity key={item.id}   
+                    onPress={()=>this.props.navigation.navigate('DetailScreen',{item})}
+                    >
+                        <View style={styles.itemPopularContainer}>
+                            <View style={{width: '45%',marginHorizontal:20}}>
+                                <Text style={{marginTop:15,fontSize: 14, color: colors.textDrak,fontFamily:'Montserrat-SemiBold'}}>
+                                    {item.ten}
+                                </Text>
+
+                                <View style={{flexDirection:'row',alignItems:'center',marginTop:10,marginBottom:7}}>
+                                    <Foundation name='telephone' color={'black'} size={15}/>
+                                    <Text style={{marginLeft:5,fontSize: 14, color: 'black',fontFamily:'Montserrat-Regular'}}>
+                                        {item.sdt}
+                                    </Text>
+                                </View>
+
+                                <View style={{flexDirection:'row',alignItems:'center',marginBottom:10}}>
+                                    <MaterialCommunityIcons name='map-marker' color={'black'} size={15}/>
+                                    <Text style={{marginLeft:5,fontSize: 14, color: 'black',fontFamily:'Montserrat-Regular'}}>
+                                        {this.addressChange(item.diachi)}
+                                    </Text>
+                                </View>
+
+                                <View style={{flexDirection:'row',alignItems:'center'}}>
+                                    <TouchableOpacity 
+                                        style={styles.buttonAdd}
+                                        onPress={()=>{}}
+                                    >
+                                        <Text style={{fontSize: 16, color: colors.textDrak,fontFamily:'Montserrat-Bold'}}>+</Text>
+                                    </TouchableOpacity>
+
+                                    <View style={{flexDirection:'row',justifyContent:'center',alignItems:'center',left:-10}}>
+                                        <Icon name='star' size={15} color={'black'}/>
+                                        <Text style={{marginLeft:1,fontSize: 12, color: colors.textDrak,fontFamily:'Montserrat-SemiBold'}}>{item.xeploai}</Text>
+                                    </View>
+                                </View>
+                            </View>
+                            {/* <SharedElement id={`item.${item.id}.anh`} style={{ width: "45%", height: '100%' ,borderRadius:25,left:-4}}> */}
+                            <SharedElement  id={`item.${item.id}.anh`}
+                                style={{ width: "45%", height: '100%' ,borderRadius:25}}>
+                                <Image source={{uri: 'https://raw.githubusercontent.com/duchuy-bit/Group_PHP/main/images/'+item.anh,}}
+                                    style={{ flex: 1,borderRadius:25, resizeMode:'cover'}}/>
+                            </SharedElement>
+                            {/* </SharedElement> */}
+                        </View>
+                    </TouchableOpacity>
+                    )
+                })
+            }
+        </View>
+    </ScrollView>
 }
 </View>
 
