@@ -46,6 +46,11 @@ import AccountScreen from './screen/AccountScreen';
 import { LogBox, SafeAreaView } from 'react-native';
 import CartScreen from './screen/CartScreen';
 import BillScreen from './screen/BillScreen';
+import ResortScreen from './screen/TypeService/ResortScreen';
+import ExploreScreen from './screen/TypeService/ExploreScreen';
+import FoodScreen from './screen/TypeService/FoodScreen';
+import GolfScreen from './screen/TypeService/GolfScreen';
+import SearchScreen from './screen/SearchScreen';
 
 
 
@@ -98,6 +103,12 @@ return(
             {/* <Stack.Screen  name = "AddToCartScreen"  component={AddToCartScreen}/> */}
             <Stack.Screen name = "CartScreen" component={CartScreen}/>
             <Stack.Screen name = "BillScreen" component={BillScreen}/>
+            <Stack.Screen name = "ResortScreen" component={ResortScreen}/>
+            <Stack.Screen name = "ExploreScreen" component={ExploreScreen}/>
+            <Stack.Screen name = "FoodScreen" component={FoodScreen}/>
+            <Stack.Screen name = "GolfScreen" component={GolfScreen}/>
+            <Stack.Screen name = "SearchScreen" component={SearchScreen}/>
+
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

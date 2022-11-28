@@ -268,30 +268,65 @@ class CartScreen extends Component {
             console.log("Bill: "+ this.state.bill.id)
 
             let tam=[]; let obj={}
-            this.state.listCart.forEach((element)=>{
-                // console.log(element)
-                // this.fetchInsertCTHD(element.id_gia, element.sl, element.giatien)
-                obj={id_hd: this.state.bill.id, id_gia: element.id_gia, sl: element.sl, giatien : element.giatien}
-                tam.push(obj)
-                // this.fetchDelete(element.id_gia)
+            // this.state.listCart.forEach((element)=>{
+            //     obj={id_hd: this.state.bill.id, id_gia: element.id_gia, sl: element.sl, giatien : element.giatien}
+            //     tam.push(obj)
+            // })
+            boolCheck=false;
+            fetch(ipconfig+'/giohang', { method: 'POST',
+                headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
+                body: JSON.stringify({ id: this.props.idCustomer[0],})
+            })
+            .then((response)=> response.json())
+            .then((res)=>{
+                d = 0;
+                console.log(res.giohang.length)
+                res.giohang.forEach((element)=>{
+                    d++;
+                    console.log("d="+d);
+                    if (d >= res.giohang.length ){ console.log('OK'); boolCheck = true;}
+                    obj={id_hd: this.state.bill.id, id_gia: element.id_gia, sl: element.sl, giatien : element.giatien}
+                    tam.push(obj)
+                })
+            }).finally(()=>{
+                console.log("Tam")
+                tam.forEach((element)=>{
+                    console.log(element.id_gia)
+                })
+
+                this.tryFetchDelete(tam)
+                // .finally(()=>{
+                console.log("finally")
+        
+                //     // setTimeout(() => {
+                this.setState({delayPay: false});
+        
+                setTimeout(() => {
+                    this.setState({isLoadPay: false})
+                    this.props.navigation.replace('BillScreen',{bill:this.state.bill})
+                }, 700);
             })
 
-            console.log("Tam")
-            tam.forEach((element)=>{
-                console.log(element.id_gia)
-            })
+            // if (boolCheck){
+            //     console.log("Tam")
+            //     tam.forEach((element)=>{
+            //         console.log(element.id_gia)
+            //     })
 
-            this.tryFetchDelete(tam)
-            // .finally(()=>{
-            console.log("finally")
-    
-            //     // setTimeout(() => {
-            this.setState({delayPay: false});
-    
-            setTimeout(() => {
-                this.setState({isLoadPay: false})
-                this.props.navigation.replace('BillScreen',{bill:this.state.bill})
-            }, 700);
+            //     this.tryFetchDelete(tam)
+            //     // .finally(()=>{
+            //     console.log("finally")
+        
+            //     //     // setTimeout(() => {
+            //     this.setState({delayPay: false});
+        
+            //     setTimeout(() => {
+            //         this.setState({isLoadPay: false})
+            //         this.props.navigation.replace('BillScreen',{bill:this.state.bill})
+            //     }, 700);
+            // }
+
+            
                 // }, 2000);
         })
         .catch((err)=> console.log(err))

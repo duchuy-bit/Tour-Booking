@@ -275,7 +275,7 @@ return(
 <ScrollView>
     <View>
         <SharedElement  id={`item.${item.id}.anh`} >
-        <Image source={{uri: 'https://raw.githubusercontent.com/duchuy-bit/Group_PHP/main/images/'+item.anh,}}
+        <Image source={{uri: 'https://duchuy-mobile.000webhostapp.com/dashboard/image_dichvu/'+item.anh,}}
             style={{width:"100%",height:height/3,resizeMode:'cover',borderBottomLeftRadius:40}}
         />
         </SharedElement>    
