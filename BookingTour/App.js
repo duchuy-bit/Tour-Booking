@@ -51,6 +51,8 @@ import ExploreScreen from './screen/TypeService/ExploreScreen';
 import FoodScreen from './screen/TypeService/FoodScreen';
 import GolfScreen from './screen/TypeService/GolfScreen';
 import SearchScreen from './screen/SearchScreen';
+import ListBill from './screen/ListBill';
+import Developer from './screen/Developer';
 
 
 
@@ -100,7 +102,6 @@ return(
             <Stack.Screen name = "HomeScreen" component = {HomeScreen} />
             <Stack.Screen  name = "DetailScreen"  component={DetailScreen}/>
             <Stack.Screen  name = "AccountScreen"  component={AccountScreen}/>
-            {/* <Stack.Screen  name = "AddToCartScreen"  component={AddToCartScreen}/> */}
             <Stack.Screen name = "CartScreen" component={CartScreen}/>
             <Stack.Screen name = "BillScreen" component={BillScreen}/>
             <Stack.Screen name = "ResortScreen" component={ResortScreen}/>
@@ -108,6 +109,8 @@ return(
             <Stack.Screen name = "FoodScreen" component={FoodScreen}/>
             <Stack.Screen name = "GolfScreen" component={GolfScreen}/>
             <Stack.Screen name = "SearchScreen" component={SearchScreen}/>
+            <Stack.Screen name = "ListBill" component={ListBill}/>
+            <Stack.Screen name = "Developer" component={Developer}/>
 
         </Stack.Navigator>
       </NavigationContainer>

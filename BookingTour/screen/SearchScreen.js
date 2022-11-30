@@ -1,66 +1,87 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions, StyleSheet, TouchableOpacity, Image, ScrollView, Modal,Animated, Pressable } from 'react-native';
-// import LinearGradient from 'react-native-linear-gradient';
-
-import { connect } from "react-redux";
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity,Image, ScrollView, Animated } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
+import colors from '../assets/colors/color';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Ioni from "react-native-vector-icons/Ionicons";
 import Octicon from "react-native-vector-icons/Octicons";
 import Foundation from "react-native-vector-icons/Foundation";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import colors from '../assets/colors/color';
+
+import {SharedElement} from 'react-navigation-shared-element';
+// import {SharedElement} from "react-navigation-shared-element";
+// import {
+//     SharedElement,
+//     SharedElementTransition,
+//     nodeFromRef
+// } from 'react-native-shared-element';
+
+
+// import FontAwe5 from "react-native-vector-icons/FontAwesome5";
+
+import MenuComponent from '../components/MenuComponent';
 import CartComponent from '../components/CartComponent';
 import ipconfig from '../ipconfig';
 
-import {SharedElement} from 'react-navigation-shared-element';
-// import ipconfig from '../ipconfig';
-// import LoadingComponent from '../components/LoadingComponent';
-// import { ta } from 'date-fns/locale';
-// import colors from '../assets/colors/color';
-
-// import Swipeable from 'react-native-gesture-handler/Swipeable'
-// import { PanGestureHandler } from 'react-native-gesture-handler';
-// import Animated from 'react-native-reanimated';
-// import ThreeDotLoading from '../components/ThreeDotLoading';
-// import SuccessLoading from '../components/SuccessLoading';
-
+// FontAwe5.loadFont();
 Icon.loadFont();
 Ioni.loadFont();
 Octicon.loadFont();
 Foundation.loadFont();
 MaterialCommunityIcons.loadFont();
 
-
 const {height, width} = Dimensions.get('window');
+
+
+import { connect } from "react-redux";
+import ProgressCircleComponent from '../components/ProgressCircleComponent';
 
 export default class SearchScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
             listService: [],
-            txtSearch:''
+            txtSearch:'',
+            checkFocusTextInput:false
         };
     }
 
-    async fetchService(){
-        await fetch(ipconfig+"/dichvu",{ method: 'POST',
+    // async fetchService(){
+    //     await fetch(ipconfig+"/dichvu",{ method: 'POST',
+    //         headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
+    //         body: JSON.stringify({id_loai: 1})
+    //     }).then((res=> res.json()))
+    //     .then((res)=>{
+    //         this.setState({listService: res.dichvu});
+    //         // res.dichvu.forEach(element => {
+    //         //     console.log(element)
+    //         // });
+    //     })
+    //     .catch((err)=> console.log(err))
+    // }
+    async fetchSearchService(key){        
+        await fetch(ipconfig+"/searchdichvu",{ method: 'POST',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
-            body: JSON.stringify({id_loai: 1})
+            body: JSON.stringify({keySearch: key})
         }).then((res=> res.json()))
         .then((res)=>{
+            console.log(res);
             this.setState({listService: res.dichvu});
-            // res.dichvu.forEach(element => {
-            //     console.log(element)
-            // });
         })
         .catch((err)=> console.log(err))
     }
 
+    // async fetchSearch(){
+    //     await 
+    // }
+
     UNSAFE_componentWillMount(){
         const {textSearch}= this.props.route.params;
-        this.setState=({txtSearch: textSearch})
-        console.log("find: "+textSearch)
+        this.fetchSearchService(textSearch);
+        // const {textSearch}= this.props.route.params;
+        // this.setState=({txtSearch: textSearch})
+        // console.log("find: "+textSearch)
         // this.fetchService()
     }
 
@@ -71,28 +92,35 @@ render() {
         {/* Header */}
         <View style={{flexDirection:'row', justifyContent:'space-between',marginHorizontal:30,marginTop:30,alignItems:'center'}}>
             <TouchableOpacity onPress={()=>this.props.navigation.goBack()}
-            style={{borderColor:'grey',borderWidth: 1, borderRadius:15,alignItems:'center',justifyContent:'center',height:40,width:40}}>
+            style={{borderColor:'grey',borderWidth: 1, borderRadius:15,alignItems:'center',justifyContent:'center',height:40,width:40,marginRight:15}}>
                 <Octicon name='arrow-left' size={20} color={'black'}/>
             </TouchableOpacity>
 
-            <Text style={styles.txtScreen}>List Service</Text>
+            <View style={[styles.searchContainer,{top: -10}]}>
+                <View style={styles.searchBorder}>
+                    <TouchableOpacity onPress={()=>{
+                        this.props.navigation.navigate('SearchScreen',{textSearch: this.state.txtSearch})
+                    }}>
+                        <Icon name='search' size={30} style={styles.iconSearch}/>
+                    </TouchableOpacity>
+                    <TextInput 
+                        // placeholder = {this.props.route.params.textSearch} 
+                        placeholderTextColor={"grey"} 
+                        style={styles.txtSearch} 
+                        returnKeyType="done"
+                        value={this.state.txtSearch =="" && this.state.checkFocusTextInput ==false ? this.props.route.params.textSearch: this.state.txtSearch}
+                        onChangeText={(text) => this.setState({txtSearch: text, checkFocusTextInput: true})} 
+                        onSubmitEditing={()=>{
+                            this.fetchSearchService(this.state.txtSearch)
+                        }}
+                    />
+                </View>
+            </View>
 
             <TouchableOpacity onPress={()=>this.props.navigation.navigate('CartScreen')}>
                     <CartComponent />
             </TouchableOpacity>
         </View>
-
-        <TouchableOpacity 
-            onPress={()=>{
-                fetch('https://duchuy-mobile.000webhostapp.com/app/loai_dv.php',{method: 'POST',
-                    headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
-                    body: JSON.stringify({name: "huy", luong:1})
-                })
-            }}
-            style={{height:50, width:100, backgroundColor:'pink'}}
-        >
-
-        </TouchableOpacity>
 
         {/* List Service */}
 
@@ -176,5 +204,59 @@ const styles=StyleSheet.create({
         fontSize:15,
         fontFamily: 'Montserrat-SemiBold',
         color: 'black',
-    }
+    },
+    searchContainer:{
+        // marginHorizontal: 3,
+        // width: ",
+        flex:1,
+        marginTop: 30,
+        // backgroundColor: 'pink',
+        justifyContent: 'space-between',
+        // backgroundColor: 'pink',
+        flexDirection: 'row'
+    },
+    // searchContainer
+    iconSearch:{
+        marginLeft:15
+    },
+    txtSearch:{
+        width:'80%',
+        fontSize:16,
+        fontFamily: 'Montserrat-SemiBold',
+        color: 'grey',
+    },
+    searchBorder:{
+        width: '90%',
+        height:50,
+        backgroundColor: 'white',
+        borderRadius: 50,
+        flexDirection:'row',
+        alignItems:'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 10,
+            height: 3,
+        },
+        shadowOpacity: 0.5,
+        shadowRadius: 3.84,
+        elevation: 15
+    },
+    inputSearch :{
+        width: width*3/5,
+        height: 40
+    },
+    searchForm: {
+        flexDirection: 'row',
+        backgroundColor: colors.item,
+        borderRadius: 15,
+        // borderRadius: 35,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.5,
+        shadowRadius: 3.84,
+        elevation: 5
+    },
 })

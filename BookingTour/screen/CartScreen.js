@@ -19,6 +19,7 @@ import { PanGestureHandler } from 'react-native-gesture-handler';
 // import Animated from 'react-native-reanimated';
 import ThreeDotLoading from '../components/ThreeDotLoading';
 import SuccessLoading from '../components/SuccessLoading';
+import moment from 'moment';
 
 Icon.loadFont();
 Ioni.loadFont();
@@ -186,7 +187,7 @@ class CartScreen extends Component {
                             else element.sl--;
                         // console.log('check ok: '+ el.ten+" "+ id_gia+" "+element.giatien+" "+element.sl)
                         // console.log("IdCus: "+this.props.idCustomer[0])
-                        this.fetchUpdateAmountCart(this.props.idCustomer[0],id_gia,element.sl,new Date())
+                        this.fetchUpdateAmountCart(this.props.idCustomer[0],id_gia,element.sl,moment(new Date()).utc().format('YYYY-MM-DD'))
                         return element;
                     }
                     return element;                    
@@ -253,7 +254,7 @@ class CartScreen extends Component {
             body: JSON.stringify({
                 id_khachhang : this.props.idCustomer[0], 
                 id_nhanvien : 1,
-                ngaythanhtoan: new Date(),
+                ngaythanhtoan: moment(new Date()).utc().format('YYYY-MM-DD'),
                 ten_khachhang: this.state.nameCustomer,
                 sdt_khachhang: this.state.sdtCustomer,
                 email_khachhang: this.state.emailCustomer,
@@ -468,7 +469,7 @@ return (
                     >
                         <View style={styles.itemContainer}>
                             <View style={{width:'40%',alignItems:'center',justifyContent:'center'}}>
-                                <Image source={{uri: 'https://raw.githubusercontent.com/duchuy-bit/Group_PHP/main/images/'+item.anh,}}
+                                <Image source={{uri: 'https://duchuy-mobile.000webhostapp.com/dashboard/image_dichvu/'+item.anh,}}
                                     style={{height:85,width:95,resizeMode:'cover',borderRadius: 15}}
                                 />
                             </View>

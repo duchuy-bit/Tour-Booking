@@ -9,9 +9,16 @@ import AsyncStorage  from '@react-native-async-storage/async-storage';
 
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import Octicons from 'react-native-vector-icons/Entypo';
+import Ioni from "react-native-vector-icons/Ionicons";
+import Octicons from "react-native-vector-icons/Octicons";
+import Foundation from "react-native-vector-icons/Foundation";
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 Icon.loadFont();
+Ioni.loadFont();
 Octicons.loadFont();
+Foundation.loadFont();
+MaterialCommunityIcons.loadFont();
 // import Animated,{useSharedValue, useAnimatedStyle, interpolate, withTiming, withDelay, withSequence, withSpring} from 'react-native-reanimated';
 
 import ipconfig from '../ipconfig';
@@ -36,6 +43,8 @@ constructor(props) {
         checkAnimatedSlider: true,
         isLoading: false,
         email: '',
+        usename: '',
+        phone: '',
         pass: '',
         repass: '',
         IsModalVisible: false,
@@ -50,7 +59,7 @@ constructor(props) {
         .then((res)=> res.json())
         .then((res)=> {
             this.setState({listCustomer: res.khachhang});
-            console.log(res.khachhang)
+            // console.log(res.khachhang)
         })
         .catch(err=>console.log(err))
     }
@@ -169,18 +178,27 @@ constructor(props) {
         )
     }
 
+    async fetchInsertDatabasePHP(){
+        await fetch('https://duchuy-mobile.000webhostapp.com/app/khachhang_register.php',
+        { method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
+            body: JSON.stringify({ email: this.state.email, phone: this.state.phone, usename: this.state.usename, pass: this.state.pass})
+        })
+    }
+
     Register(){
         // ------------------------ INPUT ALL INFORMATION-------------------
         if ( this.state.email.trim() === "" 
-        || this.state.pass.trim() === "" || this.state.repass.trim() === "" ) 
+        || this.state.pass.trim() === "" || this.state.usename.trim() === "" 
+        || this.state.phone.trim() === "" ) 
         {
             this.alertWarning("Warning","Please complete all information")
         }
         else{
             // -------------------PASS AND REPASS MUST BE SAME-------------------
-            if(this.state.pass !== this.state.repass){
-                this.alertWarning("Warning","Password and Confirm Password must be the same")
-            }else{  
+            // if(this.state.pass !== this.state.repass){
+                // this.alertWarning("Warning","Password and Confirm Password must be the same")
+            // }else{  
                 //    -----------EMAIL DON'T HAVE '@'-------------------
                 if(this.state.email.indexOf('@') === -1){
                     this.alertWarning("Warning","Incorrect Email")
@@ -202,22 +220,23 @@ constructor(props) {
                     }else {
                     // ------------- REGISTER OK----------
                     this.setState({IsModalVisible: true})
-                    this.fetchCustomerToDatabase().finally(()=>{
-                        fetch(ipconfig+'/khachhang')
-                        .then((res)=> res.json())
-                        .then((res)=> {
-                            this.setState({listCustomer: res.khachhang});
-                            console.log(res.khachhang)
-                        })
-                        .catch(err=>console.log(err))
-                    });
+                    this.fetchInsertDatabasePHP();
+                    // this.fetchCustomerToDatabase().finally(()=>{
+                    //     fetch(ipconfig+'/khachhang')
+                    //     .then((res)=> res.json())
+                    //     .then((res)=> {
+                    //         this.setState({listCustomer: res.khachhang});
+                    //         console.log(res.khachhang)
+                    //     })
+                    //     .catch(err=>console.log(err))
+                    // });
                     setTimeout(() => {
-                        this.setState({...this.state,IsModalVisible: false,email: '',pass: '',repass: ''});
+                        this.setState({...this.state,IsModalVisible: false,email: '',pass: '',repass: '',usename:'',phone:''});
                         this.changeHeightSliderBigger();
                     }, 5000);
                     }
                 }
-            }
+            // }
         } 
     }
 
@@ -245,14 +264,30 @@ constructor(props) {
         .catch((err)=> console.log(err))
     }
 
+    // async fetchCheckLogin(){
+    //     let id = "false";
+    //     await fetch('https://duchuy-mobile.000webhostapp.com/app/khachhangget.php',{method: 'POST',
+    //         headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
+    //         body: JSON.stringify({email: this.state.email, pass: this.state.pass})
+    //     })
+    //     .then((res)=>res.json())
+    //     .then((res)=>{
+    //         console.log(res.check);
+    //         id = res.check;
+    //         return res.che;
+    //     })
+    //     .catch((err)=>{console.log("err: ")})
+
+    // }
+
     touchButtonLogin(){
-        fetch(ipconfig+'/khachhang')
-        .then((res)=> res.json())
-        .then((res)=> {
-            this.setState({listCustomer: res.khachhang});
-            // console.log(res.khachhang)
-        })
-        .catch(err=>console.log(err))
+        // fetch(ipconfig+'/khachhang')
+        // .then((res)=> res.json())
+        // .then((res)=> {
+        //     this.setState({listCustomer: res.khachhang});
+        //     // console.log(res.khachhang)
+        // })
+        // .catch(err=>console.log(err))
         // ------------------------ INPUT ALL INFORMATION-------------------
         console.log(this.state.email);
         console.log(this.state.pass);
@@ -269,66 +304,52 @@ constructor(props) {
             else{
                 let checkEmail = false;
                 let id=0;
-                this.state.listCustomer.forEach((element)=>{
-                    if (this.state.email.toUpperCase() === element.email.toUpperCase() 
-                        &&this.state.pass === element.matkhau)
-                    { checkEmail=true; id = element.id ;return;}
-                })
-                //------------ EMAIL HAVE BEEN USED ---------------
-                if(checkEmail === false){
-                    this.alertWarning("Warning","Email or password is not correct")
-                }else {
-                // ------------- LOGIN OK----------
-                this.setState({IsModalVisible: true})
 
-                //------REDUX-------
-                this.props.dispatch({
-                    type: 'LOGINSUCCESS',
-                    id: id,
-                })
+                // this.fetchCheckLogin();
 
-                this.fetchCart(id);
-                //------CREATE CART----------
-                // let check=false;
-                // fetch(ipconfig+'/giohang')
-                // .then((res)=>res.json())
-                // .then((res)=>{
-                //     this.setState({listCart: res.giohang})
-                //     console.log(listCart)
-                //     listCart.forEach((element)=>{
-                //         if (element.id_khachhang === id){
-                //             check=true;
-                //             return;
-                //         }
-                //     })
-                // })
-                // .catch((err)=>console.log("err"))
-                // .finally(()=>
-                //     {
-                //         console.log("Check : "+check)
-                //         if (check===false){
-                //             // let today = new Date()
-                //             console.log("Date creact Cart: "+new Date())
-                //             fetch(ipconfig+ "/taogiohang",{
-                //                 method :"POST",
-                //                 headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
-                //                 body: JSON.stringify({ 
-                //                     id_khachhang: id,
-                //                     ngaytao: new Date(),
-                //                 })
-                //             }).finally(()=>console.log("Create Cart Success"))
-                //         }
-                //     }
-                // )
-                //--------ASYNC STORAGE LOGIN -------------
-                this._storageDataLogin(id);
-                //DELAY
-                setTimeout(() => {
-                    this.setState({...this.state,IsModalVisible: false,email: '',pass: ''});
-                    // this.changeHeightSliderBigger();
-                    this.props.navigation.replace('HomeScreen')
-                }, 5000);
-                }
+                fetch('https://duchuy-mobile.000webhostapp.com/app/khachhangget.php',{method: 'POST',
+                    headers: { Accept: 'application/json', 'Content-Type': 'application/json'},
+                    body: JSON.stringify({email: this.state.email, pass: this.state.pass})
+                })
+                .then((res)=>res.json())
+                .then((res)=>{
+                    console.log(res);
+                    if (res.check != 'false'){
+                        console.log('ok')
+                        id=parseInt(res.check);
+                        // ------------- LOGIN OK----------
+                        this.setState({IsModalVisible: true})
+
+                        //------REDUX-------
+                        this.props.dispatch({
+                            type: 'LOGINSUCCESS',
+                            id: id,
+                        })
+
+                        this.fetchCart(id);
+                    
+                        //--------ASYNC STORAGE LOGIN -------------
+                        this._storageDataLogin(id);
+                        //DELAY
+                        setTimeout(() => {
+                            this.setState({...this.state,IsModalVisible: false,email: '',pass: ''});
+                            // this.changeHeightSliderBigger();
+                            this.props.navigation.replace('HomeScreen')
+                        }, 5000);
+
+                    }else {
+                        console.log('err pass')
+                        this.alertWarning("Warning","Email or password is not correct")
+                    }
+                })
+                .catch((err)=>{console.log("err: ")})
+
+                // //------------ EMAIL HAVE BEEN USED ---------------
+                // if(checkEmail === false){
+                //     this.alertWarning("Warning","Email or password is not correct")
+                // }else {
+                
+                // }
             }
         }        
     }
@@ -440,12 +461,46 @@ return (
                 Create your account
             </Text>
         </View>
+
+        {/* User Name */}
         <LinearGradient colors={['#C7CEF1', '#94A2E5']} 
                                 start={{ x: 0, y: 0 }} 
                                 end={{ x: 1, y: 0 }} 
                                 style={styles.linerTextFiled}>
             <View style={styles.textInputContainer}>
                 <Icon name="person" size={20}></Icon>
+                <TextInput 
+                    value={this.state.usename}
+                    placeholder='Name' 
+                    placeholderTextColor="#576CD6"
+                    onChangeText={(text) => this.setState({...this.state,usename: text})} 
+                    style={styles.textInput} />
+            </View>
+        </LinearGradient>
+
+        {/* Phone  */}
+        <LinearGradient colors={['#C7CEF1', '#94A2E5']} 
+                                start={{ x: 0, y: 0 }} 
+                                end={{ x: 1, y: 0 }} 
+                                style={styles.linerTextFiled}>
+            <View style={styles.textInputContainer}>
+                <Foundation name="telephone" size={20}></Foundation>
+                <TextInput 
+                    value={this.state.phone}
+                    placeholder='Phone' 
+                    placeholderTextColor="#576CD6"
+                    onChangeText={(text) => this.setState({...this.state,phone: text})} 
+                    style={styles.textInput} />
+            </View>
+        </LinearGradient>
+
+        {/* Email */}
+        <LinearGradient colors={['#C7CEF1', '#94A2E5']} 
+                                start={{ x: 0, y: 0 }} 
+                                end={{ x: 1, y: 0 }} 
+                                style={styles.linerTextFiled}>
+            <View style={styles.textInputContainer}>
+                <MaterialCommunityIcons name="email" size={20}></MaterialCommunityIcons>
                 <TextInput 
                     value={this.state.email}
                     placeholder='Email' 
@@ -455,6 +510,7 @@ return (
             </View>
         </LinearGradient>
 
+        {/* Password */}
         <LinearGradient colors={['#C7CEF1', '#94A2E5']} 
                                 start={{ x: 0, y: 0 }} 
                                 end={{ x: 1, y: 0 }} 
@@ -470,8 +526,8 @@ return (
                     style={styles.textInput}/>
         </View>
         </LinearGradient>
-
-        <LinearGradient colors={['#C7CEF1', '#94A2E5']} 
+        {/* Repass */}
+        {/* <LinearGradient colors={['#C7CEF1', '#94A2E5']} 
                                 start={{ x: 0, y: 0 }} 
                                 end={{ x: 1, y: 0 }} 
                                 style={styles.linerTextFiled}>
@@ -485,8 +541,8 @@ return (
                     placeholderTextColor="#576CD6" 
                     style={styles.textInput}/>
         </View>
-        </LinearGradient>
-        <View style={{marginTop: 40}}></View>
+        </LinearGradient> */}
+        <View style={{marginTop: 25}}></View>
         <TouchableOpacity onPress={()=> this.Register()} >
             <View style={styles.buttonLogin}>
                 <Text style={styles.textButtonLogin}>REGISTER</Text>

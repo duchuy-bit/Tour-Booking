@@ -165,16 +165,19 @@ return (
         </TouchableOpacity>
 
         <TouchableOpacity style={{flexDirection:'row',paddingVertical:10,marginTop:7}}
-            onPress={()=>{this.touchLogout()}}
+            onPress={()=>this.props.navigation.navigate('ListBill')}
         >
-            <Icon name='logout' size={25} color={'black'}/>
+            <Foundation name='dollar-bill' size={29} color={'black'}/>
             <Text style={styles.nameScreen}>  Your Bill</Text>
             <View style={{flex: 1,marginRight: 25,justifyContent:'flex-end',alignItems:'flex-end'}}>
                 <Octicon name='chevron-right' size={20} color={'grey'}/>
             </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={{flexDirection:'row',paddingVertical:10,marginTop:7}}>
+        <TouchableOpacity
+            onPress={()=>this.props.navigation.navigate('Developer')}
+            style={{flexDirection:'row',paddingVertical:10,marginTop:7}}
+        >
             <Ioni name='code-slash' size={25} color={'black'}/>
             <Text style={styles.nameScreen}>   About Developer</Text>
             <View style={{flex: 1,marginRight: 25,justifyContent:'flex-end',alignItems:'flex-end'}}>

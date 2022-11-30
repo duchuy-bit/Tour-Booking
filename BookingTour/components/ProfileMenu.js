@@ -75,7 +75,7 @@ return <View>
             <Text style={styles.titleItem}>Date of birth:   </Text>
             <Text style={styles.txtItem}>{
                 this.props.user[0].ngaysinh === '0000-00-00'? "Not Set": 
-                    moment(this.props.user[0].ngaysinh).utc().format('DD-MM-YYYY')
+                    moment(this.props.user[0].ngaysinh).utc().format('MMMM DD, yyyy')
             }</Text>
         </View>
 

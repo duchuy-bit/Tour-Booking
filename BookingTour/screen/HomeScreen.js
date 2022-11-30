@@ -230,6 +230,7 @@ return (
                     }}>
                         <Icon name='search' size={30} style={styles.iconSearch}/>
                     </TouchableOpacity>
+                    
                     <TextInput 
                         placeholder='Search' 
                         placeholderTextColor={"grey"} 

@@ -19,6 +19,7 @@ MaterialCommunityIcons.loadFont();
 const {height, width} = Dimensions.get('window');
 import { connect } from "react-redux";
 import ipconfig from '../ipconfig';
+import moment from 'moment';
 
 class FormAddToCart extends Component {
     constructor(props) {
@@ -102,7 +103,7 @@ class FormAddToCart extends Component {
                 id_khachhang: this.props.idCustomer[0],
                 id_gia: id_gia,
                 sl: sl,
-                ngaythem: new Date(),
+                ngaythem: moment(new Date()).utc().format('YYYY-MM-DD'),
             })
         })
     }
@@ -114,7 +115,7 @@ class FormAddToCart extends Component {
                 id_khachhang: this.props.idCustomer[0],
                 id_gia: idPrice, 
                 sl:sl,
-                ngaythem: new Date()
+                ngaythem: moment(new Date()).utc().format('YYYY-MM-DD')
             })
         })
     }
