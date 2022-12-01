@@ -148,19 +148,19 @@ return (
         ]
     }>
         <View style={{flex: 1,backgroundColor:colors.background,flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={()=>this.props.navigation.navigate("ResortScreen")}>
                 <Octicon name='organization' size={30}color='black'/>
             </TouchableOpacity>
 
-            <TouchableOpacity>
+            <TouchableOpacity onPress={()=>this.props.navigation.navigate("FoodScreen")}>
                 <MaterialCommunityIcons name='food-drumstick' size={30}color='black' />
             </TouchableOpacity>
 
-            <TouchableOpacity>
+            <TouchableOpacity onPress={()=>this.props.navigation.navigate("GolfScreen")}>
                 <Ioni name='ios-golf' size={30}color='black' />
             </TouchableOpacity>
 
-            <TouchableOpacity>
+            <TouchableOpacity  onPress={()=>this.props.navigation.navigate("ExploreScreen")}>
                 <Foundation name='mountains' size={30} color='black'/>
             </TouchableOpacity>
 

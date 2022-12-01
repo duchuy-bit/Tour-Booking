@@ -71,7 +71,7 @@ render() {
                 <Octicon name='arrow-left' size={20} color={'black'}/>
             </TouchableOpacity>
 
-            <Text style={styles.txtScreen}>Resort Services</Text>
+            <Text style={styles.txtScreen}>Restaurant Services</Text>
 
             <TouchableOpacity onPress={()=>this.props.navigation.navigate('CartScreen')}>
                     <CartComponent />
