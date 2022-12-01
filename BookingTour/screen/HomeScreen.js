@@ -153,7 +153,7 @@ return (
             </TouchableOpacity>
 
             <TouchableOpacity>
-                <Ioni name='restaurant' size={30}color='black' />
+                <MaterialCommunityIcons name='food-drumstick' size={30}color='black' />
             </TouchableOpacity>
 
             <TouchableOpacity>

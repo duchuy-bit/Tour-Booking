@@ -80,7 +80,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 // apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 project.ext.vectoricons = [
-    iconFontNames: [ 'MaterialIcons.ttf', 'EvilIcons.ttf', 'Octicons.ttf','FontAwesome5.tff' ] // Name of the font files you want to copy
+    iconFontNames: [ 'MaterialIcons.ttf', 'EvilIcons.ttf', 'Octicons.ttf','FontAwesome5.ttf',"Ionicons.ttf", "Foundation.ttf","MaterialCommunityIcons.ttf" ] // Name of the font files you want to copy
 ]
 
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
